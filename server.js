@@ -10,6 +10,11 @@ var months = [ 'Januar', 'Februar', 'March',
                'July', 'August', 'September',
                'October', 'November', 'December' ];
 
+var monthIndex = { januar: 0, februar: 1, march: 2,
+                   april: 3, may: 4, june: 5,
+                   july: 6, august: 7, september: 8,
+                   october: 9, november: 10, december: 11 };
+
 // we've started you off with Express, 
 // but feel free to use whatever libs or frameworks you'd like through `package.json`.
 
@@ -31,14 +36,15 @@ app.get("/:time", function (request, response) {
   var date = new Date();
   var param = request.params.time;
 
-  var reNatural = /^(Januar|Februar|March|April|May|June|July|August|September|October|November|December) (\d?\d), (\d\d\d\d)$/;
+  var reNatural = /^(Januar|Februar|March|April|May|June|July|August|September|October|November|December) (\d?\d), (\d?\d?\d?\d)$/;
   var fNatural = reNatural.test(param);
   
   if (fNatural) {//date template is valid, but check if the numbers are  correct
       var paramMonth = RegExp.$1;
       var paramDay = RegExp.$2;
       var paramYear = RegExp.$3;
-      date = new Date(param);
+      date = new Date();
+      date.setFullYear(paramYear, monthIndex[paramMonth.toLowerCase()], paramDay);
       if (date.toString() == 'Invalid Date') 
         fNatural = false;
       else 
@@ -46,7 +52,7 @@ app.get("/:time", function (request, response) {
           fNatural = false;
   }
 
-  var reUnix = /^\d+$/;
+  var reUnix = /^(\+|\-)?\d+$/;
   var fUnix = reUnix.test(param);
 
   var unixStr;
@@ -68,7 +74,6 @@ app.get("/:time", function (request, response) {
   var obj = {unix: unixStr, natural: naturalStr };
   
   response.send(JSON.stringify(obj));
-//  response.send(obj);
 });
 
 // listen for requests :)
